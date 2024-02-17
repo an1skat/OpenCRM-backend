@@ -58,8 +58,6 @@ app.get("/", (req, res) => {
 
 app.post(
     "/register",
-    registerValidation,
-    handleValidationErrors,
     userControllers.register
 )
 app.post(
