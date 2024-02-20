@@ -13,6 +13,7 @@ import User from "./models/User.js";
 import * as userControllers from "./controllers/userControllers.js";
 import { registerValidation, loginValidation } from "./validations.js";
 import handleValidationErrors from "./utils/handleValidationErrors.js";
+import checkAuth from "./utils/checkAuth.js";
 
 dotenv.config();
 
@@ -57,7 +58,9 @@ app.get("/", (req, res) => {
 });
 
 app.post(
-    "/register",
+    "/register", 
+    registerValidation,
+    handleValidationErrors,
     userControllers.register
 )
 app.post(
@@ -66,3 +69,6 @@ app.post(
     handleValidationErrors,
     userControllers.login
 )
+app.post("/auth/me", checkAuth, userControllers.getMe);
+
+app.get("/get/me", userControllers.getUserInfo)

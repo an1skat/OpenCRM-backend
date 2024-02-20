@@ -8,6 +8,16 @@ import path from "path";
 import { fileURLToPath } from "url";
 dotenv.config();
 
+const decoderToken = (token) => {
+  try {
+    const decodedToken = jwt.verify(token, process.env.JWT_KEY);
+    return decodedToken._id;
+  } catch (err) {
+    console.error("Ошибка при извлечении идентификатора пользователя:", error);
+    return null;
+  }
+};
+
 export const register = async (req, res) => {
   try {
     const exisitingUser = await UserModel.findOne({ email: req.body.email });
@@ -98,5 +108,46 @@ export const login = async (req, res) => {
     res.status(500).json({
       message: "Can't login",
     });
+  }
+};
+
+export const getMe = async (req, res) => {
+  try {
+    const user = await UserModel.findById(req.userId);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+    if (res.status === 403) {
+      return res.status(403).json({
+        message: "Haven't got access",
+      });
+    }
+    const { password, ...userData } = user._doc;
+    res.json({
+      message: "Success",
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Haven't got access",
+    });
+  }
+};
+
+export const getUserInfo = async (req, res) => {
+  try {
+    const token = req.headers.authorization.split(" ")[1];
+    const userId = decoderToken(token);
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json({ user });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error retrieving user" });
   }
 };

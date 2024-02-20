@@ -26,6 +26,12 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    telephone: {
+      type: String,
+      required: true,
+      unique: true,
+      default: "+380111111111", 
+    }
   },
   {
     timestamps: true,
