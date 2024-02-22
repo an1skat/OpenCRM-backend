@@ -151,3 +151,53 @@ export const getUserInfo = async (req, res) => {
     res.status(500).json({ message: "Error retrieving user" });
   }
 };
+
+export const uploadAvatar = async (req, res) => {
+  try {
+    const user = await UserModel.findById(req.userId);
+    const fileName = uuidv4() + ".jpg";
+
+    if (!req.files || Object.keys(req.files).length === 0) {
+      return res.status(400).json({ message: "Файл не предоставлен" });
+    }
+
+    const file = req.files.file;
+
+    const fileExtension = path.extname(file.name).toLowerCase();
+    if (fileExtension !== ".jpg" && fileExtension !== ".png") {
+      return res
+        .status(400)
+        .json({ message: "Разрешены только файлы с расширением .jpg и .png" });
+    }
+
+    const currentFilePath = fileURLToPath(import.meta.url);
+
+    const controllersDir = path.dirname(currentFilePath);
+
+    const projectDir = path.resolve(controllersDir, "..");
+
+    const AVATAR_PATH = path.resolve(projectDir, "avatars");
+
+    const filePath = path.resolve(AVATAR_PATH, fileName);
+
+    file.mv(filePath, (err) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Ошибка загрузки файла" });
+      }
+
+      user.avatar = fileName;
+      user.save();
+
+      return res.json({
+        message: "Аватар загружен",
+        filePath: filePath, 
+      });
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      message: "Не удалось загрузить аватар",
+    });
+  }
+};

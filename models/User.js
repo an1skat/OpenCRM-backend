@@ -29,8 +29,10 @@ const userSchema = new mongoose.Schema(
     telephone: {
       type: String,
       required: true,
-      unique: true,
       default: "+380111111111", 
+    },
+    avatar: {
+      type: String,
     }
   },
   {

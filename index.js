@@ -70,5 +70,6 @@ app.post(
     userControllers.login
 )
 app.post("/auth/me", checkAuth, userControllers.getMe);
+app.post('/profile/upload/avatar', checkAuth, userControllers.uploadAvatar);
 
 app.get("/get/me", userControllers.getUserInfo)
